@@ -44,7 +44,7 @@ jobs:
     - name: compute toolchain
       shell: bash
       run: |
-        sudo apt-get install -y clang-${{ matrix.toolchain-ver }} lld-${{ matrix.toolchain-ver }}
+        sudo apt-get install -y clang-${{ matrix.toolchain-ver }} lld-${{ matrix.toolchain-ver }} llvm-${{ matrix.toolchain-ver }}
         GCC_TOOLCHAIN_PREFIX=$(make list-toolchain | grep TOOLCHAIN_PREFIX | tail -1 | cut -d ' ' -f 3)
         # Map the GCC toolchain prefix to a clang --target argument:
         CLANG_TRIPLE=$(echo "${GCC_TOOLCHAIN_PREFIX}" | sed 's/-elf-/-unknown-elf/g')
@@ -69,12 +69,12 @@ jobs:
     # When LK is compiled with DEBUG=0, there's no console and no way for us
     # to read test output
     - name: qemu
-      if: ${{ matrix.project == 'qemu-virt-arm64-test' }}
+      if: ${{ matrix.project == 'qemu-virt-arm64-test' && matrix.debug != 0 }}
       shell: bash
       run: |
         env -i DEBIAN_FRONTEND=noninteractive sudo apt-get install -y qemu-system-arm
     - name: unittest
-      if: ${{ matrix.project == 'qemu-virt-arm64-test' }}
+      if: ${{ matrix.project == 'qemu-virt-arm64-test' && matrix.debug != 0 }}
       shell: bash
       run: |
         python3 scripts/unittest.py
